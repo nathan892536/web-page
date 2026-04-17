@@ -1,0 +1,206 @@
+
+<style>
+  .container {
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+  .heart {
+    font-size: 56px;
+    margin-bottom: 1rem;
+    animation: heartbeat 1.2s ease-in-out infinite;
+    display: inline-block;
+  }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    30% { transform: scale(1.18); }
+    60% { transform: scale(1.05); }
+  }
+  .question {
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    margin-bottom: 2.5rem;
+  }
+  .btn-yes {
+    background: #d4537e;
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius-lg);
+    padding: 14px 44px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+    margin-right: 1rem;
+  }
+  .btn-yes:hover { background: #c03d6a; transform: scale(1.05); }
+  .btn-yes:active { transform: scale(0.97); }
+  .btn-no {
+    position: fixed;
+    background: var(--color-background-secondary);
+    color: var(--color-text-secondary);
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 14px 44px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: none;
+    z-index: 999;
+  }
+  .success-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 420px;
+    padding: 2rem;
+    text-align: center;
+  }
+  .success-hearts {
+    font-size: 48px;
+    margin-bottom: 1rem;
+    animation: pop 0.4s ease-out;
+  }
+  .success-title {
+    font-size: 30px;
+    font-weight: 500;
+    color: #d4537e;
+    margin-bottom: 0.75rem;
+    animation: pop 0.5s 0.1s both ease-out;
+  }
+  .success-msg {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    max-width: 320px;
+    line-height: 1.7;
+    animation: pop 0.5s 0.2s both ease-out;
+  }
+  .floating-hearts {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .fh {
+    position: absolute;
+    bottom: -50px;
+    font-size: 22px;
+    animation: floatUp linear forwards;
+    opacity: 0.7;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) rotate(-10deg); opacity: 0.7; }
+    100% { transform: translateY(-110vh) rotate(15deg); opacity: 0; }
+  }
+  @keyframes pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .tries-counter {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    margin-top: 2rem;
+    min-height: 18px;
+  }
+</style>
+
+<div class="floating-hearts" id="floatingHearts"></div>
+
+<div class="container" id="mainScreen">
+  <span class="heart">💗</span>
+  <p class="question">Do you love me?</p>
+  <p class="subtitle">Think carefully before you answer...</p>
+  <div>
+    <button class="btn-yes" onclick="sayYes()">Yes</button>
+    <button class="btn-no" id="btnNo" onmouseenter="runAway()" onclick="runAway()">No</button>
+  </div>
+  <p class="tries-counter" id="triesMsg"></p>
+</div>
+
+<div class="success-screen" id="successScreen">
+  <div class="success-hearts">💖✨💖</div>
+  <p class="success-title">Yay! I knew it!</p>
+  <p class="success-msg">You just made my whole day. Actually, my whole year. My whole existence, really. Thank you for choosing love. 💕</p>
+</div>
+
+<script>
+  let tries = 0;
+  const messages = [
+    "Nice try...", "Nope!", "Too slow!", "Hehe", "Gotcha!", "Nuh-uh!", "Try again!", "Running away~"
+  ];
+
+  const btn = document.getElementById('btnNo');
+
+  function placeButtonRandomly() {
+    const margin = 60;
+    const bw = btn.offsetWidth || 130;
+    const bh = btn.offsetHeight || 52;
+    const maxX = window.innerWidth - bw - margin;
+    const maxY = window.innerHeight - bh - margin;
+    const x = margin + Math.random() * maxX;
+    const y = margin + Math.random() * maxY;
+    btn.style.left = x + 'px';
+    btn.style.top = y + 'px';
+  }
+
+  function runAway() {
+    tries++;
+    placeButtonRandomly();
+    const msg = messages[Math.min(tries - 1, messages.length - 1)];
+    document.getElementById('triesMsg').textContent = msg;
+  }
+
+  function sayYes() {
+    document.getElementById('mainScreen').style.display = 'none';
+    btn.style.display = 'none';
+    const s = document.getElementById('successScreen');
+    s.style.display = 'flex';
+    launchHearts();
+  }
+
+  function launchHearts() {
+    const container = document.getElementById('floatingHearts');
+    const emojis = ['💗','💕','💖','💝','💓','💞','✨'];
+    for (let i = 0; i < 18; i++) {
+      setTimeout(() => {
+        const el = document.createElement('span');
+        el.className = 'fh';
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = Math.random() * 95 + '%';
+        el.style.animationDuration = (2.5 + Math.random() * 3) + 's';
+        el.style.fontSize = (14 + Math.random() * 16) + 'px';
+        container.appendChild(el);
+        setTimeout(() => el.remove(), 6000);
+      }, i * 120);
+    }
+  }
+
+  window.addEventListener('load', () => {
+    const margin = 20;
+    const bw = btn.offsetWidth || 130;
+    btn.style.left = (margin + bw + 24) + 'px';
+    btn.style.top = '50%';
+    btn.style.transform = 'translateY(-50%)';
+
+    setTimeout(() => {
+      const rect = document.getElementById('mainScreen').getBoundingClientRect();
+      btn.style.left = (rect.left + rect.width / 2 + 20) + 'px';
+      btn.style.top = (rect.top + rect.height * 0.62) + 'px';
+      btn.style.transform = '';
+    }, 50);
+  });
+</script>
